@@ -5,6 +5,11 @@ using System.Reflection;     // to use Missing.Value
 //TO DO: If you use the Microsoft Outlook 11.0 Object Library, uncomment the following line.
 using Outlook = Microsoft.Office.Interop.Outlook;
 
+using OpenQA.Selenium;
+
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+
 namespace Calendar
 {
     class Program
@@ -13,7 +18,12 @@ namespace Calendar
         {
             Console.WriteLine("Hello, sir");
 
-            
+
+            string homeURL = "https://bakalari.gymjh.cz/next/rozvrh.aspx?s=next";
+            IWebDriver driver = new ChromeDriver("Resources");
+
+            driver.Navigate().GoToUrl(homeURL);
+            WebDriverWait wait = new WebDriverWait(driver, System.TimeSpan.FromSeconds(5));
 
         }
 
