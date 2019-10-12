@@ -9,27 +9,43 @@ using OpenQA.Selenium;
 
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using System.Collections.Generic;
 
-namespace Calendar
+namespace ConsoleApp1
 {
+
+    public class Subject
+    {
+        public static string subject;
+        public static DateTime dateTimeStart;
+        public static string notes;
+
+        public string getSubject() { return subject; }
+        public void putSubject(string subjectName) { subjectName = subject; }
+    }
+
+    public class Day
+    {
+        public static Subject[] subjects;
+        public static DateTime dateTimeStart;
+        public static string notes;
+    }
+
+    public class Week
+    {
+        public static Day[] days;
+        public static DateTime dateTimeStart;
+        public static string notes;
+
+    }
+
     class Program
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, sir");
+        public static string logInUrl = "https://bakalari.gymjh.cz/next/login.aspx";
 
+        public static IWebDriver driver = new ChromeDriver();
 
-            string homeURL = "https://bakalari.gymjh.cz/next/rozvrh.aspx?s=next";
-            IWebDriver driver = new ChromeDriver();
-            //"Resources"
-
-            driver.Navigate().GoToUrl(homeURL);
-            WebDriverWait wait = new WebDriverWait(driver, System.TimeSpan.FromSeconds(5));
-
-        }
-
-
-        public void addAppointment()
+        public static void addAppointment()
         {
             try
             {
@@ -67,7 +83,7 @@ namespace Calendar
             }
         }
 
-        public void printFistAppointmentInfo()
+        public static void printFistAppointmentInfo()
         {
             try
             {
@@ -120,6 +136,88 @@ namespace Calendar
                 Console.WriteLine("{0} Exception caught.", e);
             }
         }
+
+        public static void logIn(Boolean rememberMe)
+        {
+            
+
+            driver.Navigate().GoToUrl(logInUrl);
+
+            driver.FindElement(By.Id("username")).SendKeys("ANIKI91843");
+            driver.FindElement(By.Id("password")).SendKeys("1f7nv1qe");
+
+            if (rememberMe) driver.FindElement(By.XPath("//*[@id='labelpersistent']")).Click();
+
+            driver.FindElement(By.Id("loginButton")).Click();
+
+        }
+
+        public static void goToKlasifikace()
+        {
+            driver.FindElement(By.XPath("//*[@id='panel']/div/nav/ul/li[6]/a")).Click();
+            driver.FindElement(By.XPath("//*[@id='panel']/div/nav/ul/li[6]/ul/li[1]/a")).Click();
+        }
+
+        public static void goToRozvrh()
+        {
+            driver.FindElement(By.XPath("//*[@id='panel']/div/nav/ul/li[8]/a")).Click();
+            driver.FindElement(By.XPath("//*[@id='panel']/div/nav/ul/li[8]/ul/li[1]/a")).Click();
+        }
+
+        public static void navigateToRozvrh(Boolean nextWeek)
+        {
+            if(nextWeek) driver.Navigate().GoToUrl("https://bakalari.gymjh.cz/next/rozvrh.aspx?s=next");
+            else driver.Navigate().GoToUrl("https://bakalari.gymjh.cz/next/rozvrh");
+        }
+
+        public static Week getWeek()
+        {
+            Week week = new Week();
+
+            IList<IWebElement> weekList = driver.FindElements(By.ClassName("day-row"));
+
+            // XPATH OF FIRST DATE --- GET ALL BY XPATH ??? - OR LOOPS??? //*[@id="schedule"]/div/div[2]/div/div/div/div/span
+
+            return week;
+        }
+
+        public static Day getDay()
+        {
+            IList<IWebElement> subjectsList = driver.FindElements(By.ClassName(""));
+
+            Day day = new Day();
+
+            /*
+            int i = 0;
+            foreach (IWebElement subjectElement in subjectsList)
+            {
+                day.subjects[i].putSubject("");
+                i++;
+            }
+            */
+            return day;
+        }
+
+        public static Subject getSubject()
+        {
+            Subject subject = new Subject();
+
+
+
+            return subject;
+        }
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello, sir");
+
+            logIn(true);
+
+            navigateToRozvrh(false);
+
+        }
+
+        
 
     }
 }
