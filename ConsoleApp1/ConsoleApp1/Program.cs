@@ -16,12 +16,12 @@ namespace ConsoleApp1
 
     public class Subject
     {
-        public static string subject;
+        public static string subject { get; set; }
         public static DateTime dateTimeStart;
         public static string notes;
 
-        public string getSubject() { return subject; }
-        public void putSubject(string subjectName) { subjectName = subject; }
+        //public string getSubject() { return subject; }
+        //public void putSubject(string subjectName) { subjectName = subject; }
     }
 
     public class Day
@@ -34,7 +34,7 @@ namespace ConsoleApp1
     public class Week
     {
         public static Day[] days;
-        public static DateTime dateTimeStart;
+        public DateTime dateTimeStart { get; set; }
         public static string notes;
 
     }
@@ -167,14 +167,43 @@ namespace ConsoleApp1
         public static void navigateToRozvrh(Boolean nextWeek)
         {
             if(nextWeek) driver.Navigate().GoToUrl("https://bakalari.gymjh.cz/next/rozvrh.aspx?s=next");
-            else driver.Navigate().GoToUrl("https://bakalari.gymjh.cz/next/rozvrh");
+            else driver.Navigate().GoToUrl("https://bakalari.gymjh.cz/next/rozvrh.aspx");
         }
 
         public static Week getWeek()
         {
             Week week = new Week();
+            DateTime today = DateTime.Now;
 
             IList<IWebElement> weekList = driver.FindElements(By.ClassName("day-row"));
+
+            int i = 0;
+            int date = 0;
+            int month = 0;
+            string firstDate = "";
+            foreach(IWebElement element in weekList)
+            {
+                //Console.WriteLine(element.FindElement(By.ClassName("day-name")).FindElement(By.TagName("span")).Text);
+                if(i == 0)
+                {
+                    week.dateTimeStart = DateTime.Now;
+                    firstDate = element.FindElement(By.ClassName("day-name")).FindElement(By.TagName("span")).Text;
+                    if (firstDate.ToCharArray()[1] == '.')
+                    {
+                        date = int.Parse(firstDate.Substring(0, 1));
+                        if (firstDate.ToCharArray()[3] == '.') month = int.Parse(firstDate.Substring(2, 1));
+                        else month = int.Parse(firstDate.Substring(2, 2));
+                    }
+                    else
+                    {
+                        date = int.Parse(firstDate.Substring(0, 2));
+                        if (firstDate.ToCharArray()[4] == '.') month = int.Parse(firstDate.Substring(3, 1));
+                        else month = int.Parse(firstDate.Substring(3, 2));
+                    }
+                    week.dateTimeStart = new DateTime(today.Year, month, date, 0, 0, 0);
+                }
+                i++;
+            }
 
             // XPATH OF FIRST DATE --- GET ALL BY XPATH ??? - OR LOOPS??? //*[@id="schedule"]/div/div[2]/div/div/div/div/span
 
@@ -214,6 +243,8 @@ namespace ConsoleApp1
             logIn(true);
 
             navigateToRozvrh(false);
+
+            Console.WriteLine(getWeek().dateTimeStart);
 
         }
 
