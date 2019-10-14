@@ -10,6 +10,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace ConsoleApp1
 {
@@ -33,9 +34,9 @@ namespace ConsoleApp1
 
     public class Week
     {
-        public static Day[] days;
+        public static Day[] days { get; set; }
         public DateTime dateTimeStart { get; set; }
-        public static string notes;
+        public static string notes { get; set; }
 
     }
 
@@ -179,14 +180,49 @@ namespace ConsoleApp1
 
 
             int i = 0;
-            foreach(IWebElement element in weekList)
+            foreach(IWebElement day in weekList)
             {
 
+                //GET DAYS[]
+                int daySubjectsCounter = 0;
+                string subjectNick = "";
+                IList<IWebElement> daysList = day.FindElements(By.ClassName("day-item"));
+                
+                foreach(IWebElement subject in daysList)
+                {
+                    try
+                    {
+                        subject.FindElement(By.ClassName("empty"));
+                    }
+                    catch
+                    {
+                        subjectNick = subject.FindElements(By.ClassName("middle"))[0].Text;
+                        if (subjectNick != "")
+                        {
+                            /* CLOSER INFO --- (get changes, exact names - in notes)
+                            IWebElement hover = subject.FindElements(By.ClassName("tooltip-bubble"))[0];
+                            Console.WriteLine(hover.GetAttribute("data-detail"));
+                            var dataDetailJson = JObject.Parse(hover.GetAttribute("data-detail"));
+                            Console.WriteLine(dataDetailJson["subjecttext"]);
+                            */
+                            daySubjectsCounter++;
+                        }
+                        else
+                        {
+                            //IF LESSON REMOVED (remove lesson from calndar if exists)
+                        }
+                    }
 
+                }
+                Console.WriteLine(daySubjectsCounter);
+                
 
                 //GET WEEK START 
-                if(i == 0) week.dateTimeStart = getWeekStart(element);
+                if(i == 0) week.dateTimeStart = getWeekStart(day);
                 i++;
+
+                //GET NOTES (LATER -- basic statistics: tests, changes, actions)
+
             }
 
             // XPATH OF FIRST DATE --- GET ALL BY XPATH ??? - OR LOOPS??? //*[@id="schedule"]/div/div[2]/div/div/div/div/span
