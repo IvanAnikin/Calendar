@@ -17,9 +17,9 @@ namespace ConsoleApp1
 
     public class Subject
     {
-        public static string subject { get; set; }
-        public static DateTime dateTimeStart;
-        public static string notes;
+        public string subject { get; set; }
+        public DateTime dateTimeStart;
+        public string notes;
 
         //public string getSubject() { return subject; }
         //public void putSubject(string subjectName) { subjectName = subject; }
@@ -27,16 +27,20 @@ namespace ConsoleApp1
 
     public class Day
     {
-        public static Subject[] subjects;
-        public static DateTime dateTimeStart;
-        public static string notes;
+        public Subject[] subjects { get; set; }
+        public DateTime dateTimeStart { get; set; }
+        public string notes { get; set; }
+
+        public int dayLength { get; set; }
     }
 
     public class Week
     {
-        public static Day[] days { get; set; }
+        public Day[] days { get; set; }
         public DateTime dateTimeStart { get; set; }
-        public static string notes { get; set; }
+        public string notes { get; set; }
+
+        public int weekLength { get; set; }
 
     }
 
@@ -180,15 +184,18 @@ namespace ConsoleApp1
 
 
             int i = 0;
-            foreach(IWebElement day in weekList)
+            foreach(IWebElement dayList in weekList)
             {
 
                 //GET DAYS[]
                 int daySubjectsCounter = 0;
                 string subjectNick = "";
-                IList<IWebElement> daysList = day.FindElements(By.ClassName("day-item"));
-                
-                foreach(IWebElement subject in daysList)
+                IList<IWebElement> subjectsList = dayList.FindElements(By.ClassName("day-item"));
+
+                Day day = new Day();
+
+                int daysCounter = 0;
+                foreach (IWebElement subject in subjectsList)
                 {
                     try
                     {
@@ -197,6 +204,7 @@ namespace ConsoleApp1
                     catch
                     {
                         subjectNick = subject.FindElements(By.ClassName("middle"))[0].Text;
+
                         if (subjectNick != "")
                         {
                             /* CLOSER INFO --- (get changes, exact names - in notes)
@@ -205,7 +213,14 @@ namespace ConsoleApp1
                             var dataDetailJson = JObject.Parse(hover.GetAttribute("data-detail"));
                             Console.WriteLine(dataDetailJson["subjecttext"]);
                             */
+
+                            //Console.Write(subjectNick + "; ");
+                            //testing stuff
+
+                            day.dayLength = daySubjectsCounter;
+                            day.subjects[daySubjectsCounter].subject = subjectNick;
                             daySubjectsCounter++;
+
                         }
                         else
                         {
@@ -213,19 +228,21 @@ namespace ConsoleApp1
                         }
                     }
 
+
+                    week.days[daysCounter] = day;
+                    week.weekLength = daysCounter;
+                    daysCounter++;
+
                 }
-                Console.WriteLine(daySubjectsCounter);
-                
 
                 //GET WEEK START 
-                if(i == 0) week.dateTimeStart = getWeekStart(day);
+                if (i == 0) week.dateTimeStart = getWeekStart(dayList);
                 i++;
 
                 //GET NOTES (LATER -- basic statistics: tests, changes, actions)
 
             }
 
-            // XPATH OF FIRST DATE --- GET ALL BY XPATH ??? - OR LOOPS??? //*[@id="schedule"]/div/div[2]/div/div/div/div/span
             
             return week;
         }
@@ -292,7 +309,17 @@ namespace ConsoleApp1
 
             navigateToRozvrh(false);
 
-            Console.WriteLine(getWeek().dateTimeStart);
+            Week week = getWeek();
+
+            for(int i=0; i<week.weekLength; i++)
+            {
+                for(int j=0; j<week.days[i].dayLength; j++)
+                {
+                    Console.Write(week.days[i].subjects[j].subject);
+                }
+                Console.WriteLine("-------------------------------------------");
+                
+            }
 
         }
 
